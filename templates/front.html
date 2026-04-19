@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic Background Chat</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background-image 1s ease-in-out;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        #chat-box {
+            width: 400px;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            background: rgba(255,255,255,0.85);
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Core Messenger</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="user_msg" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = io("http://127.0.0.1:5555", { transports: ['polling'] });
+
+        socket.on('connect', function() {
+            console.log("Connected!");
+        });
+
+        socket.on('receive_message', function(data) {
+            console.log("received:", data);
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<p><strong>User:</strong> ${data.msg}</p>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            if (data.url) {
+                document.body.style.backgroundImage = `url('${data.url}')`;
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('user_msg');
+            socket.emit('send_message', { msg: input.value });
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
