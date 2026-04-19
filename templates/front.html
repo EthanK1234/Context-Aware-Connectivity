@@ -36,7 +36,7 @@
     <button onclick="sendMessage()">Send</button>
 
     <script>
-        const socket = io("http://127.0.0.1:5555", { transports: ['polling'] });
+        const socket = io();
 
         socket.on('connect', function() {
             console.log("Connected!");
